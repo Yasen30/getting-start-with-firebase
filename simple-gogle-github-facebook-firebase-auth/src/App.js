@@ -6,6 +6,7 @@ import {
   getAuth,
   GithubAuthProvider,
   signOut,
+  FacebookAuthProvider,
 } from "firebase/auth";
 import "./App.css";
 
@@ -13,10 +14,27 @@ initializeAuthentication();
 
 const gogleProvider = new GoogleAuthProvider();
 const gthubProvider = new GithubAuthProvider();
-
+const facebookProvider = new FacebookAuthProvider();
 function App() {
   const [user, setUser] = useState({});
+
   const auth = getAuth();
+  const handleFacebookSignIn = () => {
+    signInWithPopup(auth, facebookProvider)
+      .then((result) => {
+        const { displayName, email, photoURL } = result.user;
+        const loggedInUser = {
+          name: displayName,
+          email: email,
+          photo: photoURL,
+        };
+        setUser(loggedInUser);
+      })
+      .catch((error) => {
+        const errorMessge = error.message;
+        console.log(errorMessge);
+      });
+  };
   const handleGogleSignIn = () => {
     signInWithPopup(auth, gogleProvider)
       .then((result) => {
@@ -55,12 +73,13 @@ function App() {
     <div className="App">
       {user.name ? (
         <div>
-          <button onClick={handleGogleSignOut}>Gogle Sign Out</button>
+          <button onClick={handleGogleSignOut}> Sign Out</button>
         </div>
       ) : (
         <div>
           <button onClick={handleGithubSignIn}>Git Sign in </button>
           <button onClick={handleGogleSignIn}>Gogle Sign In</button>
+          <button onClick={handleFacebookSignIn}>Facebook Sign in</button>
         </div>
       )}
       {user.name && (
